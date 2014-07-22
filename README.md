@@ -19,16 +19,15 @@ How to compile
     # add-apt-repository ppa:vala-team/ppa
     # aptitude  update
     # aptitude  install tshark
-    # aptitude  install vala-0.22
+    # aptitude  install vala-0.22 libgee-0.8-2 libgee-0.8-dev
     # cd /usr/share
     # mv vala/vapi/gee-0.8* vala-0.22/vapi
     # mv vala vala.old
     # ln -s vala-0.22 vala
-    # aptitude install libpcap-dev libjson-glib-1.0-0 libjson-glib-dev libgtk-3-dev libarchive-dev tshark
+    # aptitude install libpcap-dev libjson-glib-1.0-0 libjson-glib-dev libgtk-3-dev libarchive-dev tshark 
 
 Overwrite vapis files in /usr/share/vala/vapi with files in vapis directory.
 
-install gee-0.8
 
     $ cd npc
     $ make linux
