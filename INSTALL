@@ -1,0 +1,23 @@
+For Linux
+add-apt-repository ppa:vala-team/ppa
+apt-get update
+apt-get install tshark
+apt-get install vala-0.22
+cd /usr/share
+mv vala/vapi/gee-0.8* vala-0.22/vapi
+mv vala vala.old
+ln -s vala-0.22 vala
+
+# installer gee-0.8
+
+Télécharger libpcap du site tcpdump
+./configure --prefix=/usr
+make
+make install
+
+For Windows (MingW32)
+
+$ export LANGUAGE="fr_FR"
+$ export LANGUAGE="en_EN"
+$ export PATH=$PATH;/c/Program\ Files/Wireshark/
+$ npc.exe

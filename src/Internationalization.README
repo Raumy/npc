@@ -1,0 +1,14 @@
+﻿# Création des fichiers
+
+mkdir -p locale/fr_FR/LC_MESSAGES
+xgettext -o glade.pot --language=Glade --omit-header src/npc.ui
+# msgcat -o merged.pot --use-first npc.pot glade.pot
+msginit -l fr_FR -o locale/fr_FR/LC_MESSAGES/npc.po -i glade.pot
+
+# Editer le fichier npc.po et créer les binaires
+
+cd locale/fr_FR/LC_MESSAGES
+msgfmt --check --verbose -o hello.mo hello.po
+#  valac -X -DGETTEXT_PACKAGE='"hello"' --pkg gtk+-3.0 hello.vala
+# LC_ALL="fr_FR" ./hello.exe
+# LC_ALL="en_EN" ./hello.exe

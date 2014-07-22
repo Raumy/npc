@@ -1,0 +1,79 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"PO-Revision-Date: 2013-11-20 11:48+0100\n"
+"Last-Translator: <EMAIL@ADDRESS>\n"
+"Language-Team: English\n"
+"Language: en_EN\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CP1252\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: src/npc.ui:149
+msgid "_Open"
+msgstr "Open"
+
+#: src/npc.ui:162
+msgid "_Export"
+msgstr "Export"
+
+#: src/npc.ui:204
+msgid "_IP Address"
+msgstr "IP Address"
+
+#: src/npc.ui:231
+msgid "Circle"
+msgstr "Circle"
+
+#: src/npc.ui:254
+msgid "_Connections/Sessions"
+msgstr "Connections/Sessions"
+
+#: src/npc.ui:274
+msgid "Treeview"
+msgstr "Treeview"
+
+#: src/npc.ui:360
+msgid "Navigator"
+msgstr "Navigator"
+
+#: src/npc.ui:400
+msgid "_Frame"
+msgstr "Frame"
+
+#: src/npc.ui:412
+msgid "_Source"
+msgstr "Source"
+
+#: src/npc.ui:424
+msgid "_Destination"
+msgstr "Destination"
+
+#: src/npc.ui:436
+msgid "_Length"
+msgstr "Length"
+
+#: src/npc.ui:448
+msgid "_Time"
+msgstr "Time"
+
+#: src/npc.ui:460
+msgid "_Decode"
+msgstr "Decode"
+
+#: src/npc.ui:488
+msgid "_Delete"
+msgstr "Delete"
+
+#: src/npc.ui:496
+msgid "_Change Icon"
+msgstr "Change Icon"
+
+#: src/npc.ui:504
+msgid "_Choose host as reference"
+msgstr "Choose host as reference"
+
+#: src/npc.ui:512
+msgid "_Show / hide"
+msgstr "Show / hide"

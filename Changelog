@@ -1,0 +1,56 @@
+Info: You can press shift while selecting frames in navigator view or press right button to zoom
+See INSTALL to see variables environnement to set.
+npc-win32.v2.1.tar.gz has been tested, it should run ;)
+
+2014-03-24 - v2.1:
+	. Add size informations in Circle Pair view (right click to show a pop up)
+		. total size for a connection
+		. size from hosts
+	. bugs correction in libnetframes and npc
+2014-02-21 - v2.0:
+	. Created a new library "NetFrames" (libnetframes)
+	. Bug correction (host suppression in Hosts listbox)
+	. Autodetect tshark (tshark.exe) if in PATH variable environnement
+
+2014-01-22 - v1.9:
+	+ Bug corrected : when opening a file while a host is selected cause an ugly console error 
+	+ Created a class to handle IO for NPC file
+	info: you need to install libjson-glib-1.0 and libarchive-3.xx
+	
+2014-01-22 - v1.8:
+	+ Import / Export datas in PCAP file
+	+ Open / Save NPC files (Network Packet Cleaner File)
+		NPC file is just a tarball with a pcap file and hosts configuration.
+		
+2014-01-01 - v1.7: 
+	+ New "rubberband" selection
+	+ Optimize refresh list'frames when selecting frames in Navigator
+
+1.6:
+	+ Remove badly implemented thread update
+	+ Reimplement "copy area" to just copy borders of rectable, drastically improve performance
+	+ Add colors in navigator view, related to data length of frames
+
+1.5:
+	+ update frames box is threaded 
+	+ copy area in navigator view to improve performance (trying to avoid redraw each time)
+
+1.4 :
+	+ Global performance improvement.
+		* contextual menu in navigator view, right click on host to get the pop up
+		* specific model to improve speed on frames selection and refresh Frames treeview on bottom of window
+
+1.31:
+	- Navigator
+		Minor correction : user can create a region  from right to left and frames are selected
+		
+1.3:
+	- Navigator
+		User can select frames by creating a region (click / move / release), 
+		Treeview Connections shows the selected frames
+	- Internationalization
+		set LANGUAGE="fr_FR" ou "en_EN"
+	
+1.2:
+	Create a new view : Navigator
+		- User can zoom and scroll

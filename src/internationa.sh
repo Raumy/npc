@@ -1,0 +1,9 @@
+xgettext colors_scheme.vala   -o npc.pot --language=C++ -a  --omit-header
+xgettext io_board.vala -j -o npc.pot --language=C++ -a  --omit-header
+xgettext npc_interface.vala -j -o npc.pot --language=C++ -a  --omit-header
+xgettext main.vala -j -o npc.pot --language=C++ -a  --omit-header
+xgettext hosts_graph.vala -j -o npc.pot --language=C++ -a  --omit-header
+xgettext graph_utils.vala -j -o npc.pot --language=C++ -a  --omit-header
+xgettext frames_model.vala -j -o npc.pot --language=C++ -a  --omit-header
+xgettext circle_interface.vala -j -o npc.pot --language=C++ -a  --omit-header
+xgettext navigator_interface.vala -j -o npc.pot --language=C++ -a  --omit-header
