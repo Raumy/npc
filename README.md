@@ -25,9 +25,11 @@ How to compile
     # mv vala vala.old
     # ln -s vala-0.22 vala
     # aptitude install libpcap-dev libjson-glib-1.0-0 libjson-glib-dev libgtk-3-dev libarchive-dev tshark 
+    # aptitude install libgtk-3-dev
 
 Overwrite vapis files in /usr/share/vala/vapi with files in vapis directory.
-
+    
+    # cp vapis/* /usr/share/vala-0.20/vapi
 
     $ cd npc
     $ make linux
