@@ -1,4 +1,4 @@
-npc
+Network PAcket Cleaner (npc)
 ===
 
 Network Packet Cleaner helps you to easily clean a "pcap" file by manipulating graphically hosts, connections, sessions.
