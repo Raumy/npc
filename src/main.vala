@@ -1,7 +1,7 @@
 /*
  * main.vala
  *
- * Copyright 2013-2014 Cyriac REMY <raum@no-log.org>
+ * Copyright 2013-2014 Cyriac REMY <cyriac.remy@no-log.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -49,15 +49,10 @@ public class NPC.MainWindow {
 	public static bool shift_pressed = false;
 
 	public MainWindow.from_file(string filename) {
-
 		capture = new Capture(filename);
 
 		init_main_application();
-		# if (LINUX)
-			main_interface.init_from_capture(capture, true);
-		# else
-			main_interface.init_from_capture(capture);
-		# endif
+		main_interface.init_from_capture(capture);
 
 		select_captured_host();
 	}
@@ -110,6 +105,7 @@ public class NPC.MainWindow {
 	}
 
 	void init_menu(Gtk.Builder builder) {
+		/*
 		Gtk.MenuItem mi = null;
 		mi = builder.get_object("menuitem_open") as Gtk.MenuItem;
 		mi.activate.connect(open_board);
@@ -121,18 +117,15 @@ public class NPC.MainWindow {
 		mi.activate.connect(export_capture);
 		mi = builder.get_object("menuitem_quit") as Gtk.MenuItem;
 		mi.activate.connect(stop_main);
+		*/
 
-/*
-		Gtk.CheckMenuItem ci = builder.get_object("chk_show_hosts_ref") as Gtk.CheckMenuItem;
-		ci.activate.connect(check_show_hosts_reference);
-*/
+		((Gtk.MenuItem) builder.get_object("menuitem_open")).activate.connect(open_board);
+		((Gtk.MenuItem) builder.get_object("menuitem_save")).activate.connect(save_board);
+		((Gtk.MenuItem) builder.get_object("menuitem_import")).activate.connect(import_capture);
+		((Gtk.MenuItem) builder.get_object("menuitem_export")).activate.connect(export_capture);
+		((Gtk.MenuItem) builder.get_object("menuitem_quit")).activate.connect(stop_main);
+
 	}
-	/*	bool window_state_event (Gdk.EventWindowState event) {
-	        // main_interface.navigator.da.host_changed = true;
-	        // main_interface.navigator.da.nav_lines_changed = true;
-	        return true;
-	   }
-	 */
 
 	public void select_captured_host() {
 		TreeModel model;
@@ -252,10 +245,7 @@ public class NPC.MainWindow {
 			capture = new Capture(filename);
 			msg.destroy();
 			main_interface.clear();
-			# if LINUX
-			main_interface.init_from_capture(capture, true);
-			# else
-				main_interface.init_from_capture(capture);
+			main_interface.init_from_capture(capture);
 
 			select_captured_host();
 		} else {
