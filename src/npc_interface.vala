@@ -1,7 +1,7 @@
 /*
  * NPC_interface.vala
  * 
- * Copyright 2013-2014 Cyriac REMY <raum@no-log.org>
+ * Copyright 2013 Cyriac REMY <cyriac.remy@no-log.org>
  * 
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -89,6 +89,8 @@ public class ConnectsInfos {
 
 
 public class NPC.Interface : Object {
+	public Gtk.Builder builder { get { return NPC.MainWindow.builder; } }
+
 	public signal void sig_clicked_host(HostGraph hg);
 	public signal void sig_clicked_connection(Connection conn);
 	public signal void sig_host_renamed(string name, string newname);
@@ -144,7 +146,7 @@ public class NPC.Interface : Object {
 		
 		tv_hosts.add_events(Gdk.EventMask.BUTTON_RELEASE_MASK);
 		tv_hosts.button_release_event.connect(on_hosts_button_press_event);
-		tsel_hosts.set_mode(SelectionMode.MULTIPLE);
+		//tsel_hosts.set_mode(SelectionMode.MULTIPLE);
 
 		/* Connections initilization (second onglet) */
 		tv_connects =  NPC.MainWindow.builder.get_object("tv_connects") as TreeView;		
@@ -177,20 +179,16 @@ public class NPC.Interface : Object {
 		popup_hosts = NPC.MainWindow.builder.get_object("popup_hosts") as Gtk.Menu;
 		Gtk.MenuItem item = null;
 
-		item = NPC.MainWindow.builder.get_object("popup_hosts_delete") as Gtk.MenuItem;
-		item.activate.connect(on_hosts_delete);
-		item = NPC.MainWindow.builder.get_object("popup_hosts_icon") as Gtk.MenuItem;
-		item.activate.connect(on_hosts_change_icon);
-		item = NPC.MainWindow.builder.get_object("popup_reference") as Gtk.MenuItem;
-		item.activate.connect(on_hosts_reference);
-		item = NPC.MainWindow.builder.get_object("popup_host_hide") as Gtk.MenuItem;
-		item.activate.connect(on_hosts_hide_unhide);
+		((Gtk.MenuItem) builder.get_object("popup_hosts_delete")).activate.connect(on_hosts_delete);
+		((Gtk.MenuItem) builder.get_object("popup_hosts_icon")).activate.connect(on_hosts_change_icon);
+		((Gtk.MenuItem) builder.get_object("popup_reference")).activate.connect(on_hosts_reference);
+		((Gtk.MenuItem) builder.get_object("popup_host_hide")).activate.connect(on_hosts_hide_unhide);
+
 
 		popup_connects = NPC.MainWindow.builder.get_object("popup_connects") as Gtk.Menu;
-		item = NPC.MainWindow.builder.get_object("popup_connects_delete") as Gtk.MenuItem;
-		item.activate.connect(on_connects_delete);
-		item = NPC.MainWindow.builder.get_object("popup_connects_hide") as Gtk.MenuItem;
-		item.activate.connect(on_connects_hide_unhide);
+
+		((Gtk.MenuItem) builder.get_object("popup_connects_delete")).activate.connect(on_connects_delete);
+		((Gtk.MenuItem) builder.get_object("popup_connects_hide")).activate.connect(on_connects_hide_unhide);
 
         notebook = NPC.MainWindow.builder.get_object("notebook1") as Notebook;
 		notebook.switch_page.connect(switch_page);
