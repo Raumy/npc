@@ -24,36 +24,37 @@ using Json;
 using Archive;
 using NetFrames;
 
-public class NPC.IOBoard {
-	public void write_board(string filename, ref NPC.Interface main_interface) {
-		Json.Builder build_json = new Json.Builder ();
+public class NPC.ConfigFile {
+	unowned NPC.Interface main_interface = null;
 
-		build_json.begin_object ();
-
-		build_json.set_member_name("hosts");
-		build_json.begin_array();
-
+	 void write_hosts(JsonConfigFile ncr) {
 		foreach (HostGraph hg in main_interface.hosts_graph) {
-			var b = build_json.begin_object ();
-			b.set_member_name("name");
-			b.add_string_value (hg.name);
-			b.set_member_name("ip_address");
-			b.add_string_value(hg.host_addr.to_string());
-			b.set_member_name("hide");
-			b.add_boolean_value(hg.hide);
-			b.end_object();
+    		ncr.builder.begin_object ();
+    		ncr.write_string("name", hg.name);
+    		ncr.write_string("ip_address", hg.host_addr.to_string());
+    		ncr.write_boolean("hide", hg.hide);
+			ncr.builder.end_object();
 		}
+	}
 
-		build_json.end_array();
-		build_json.end_object ();
+	 void write_latencies(JsonConfigFile ncr) {
+		foreach (Connection connection in main_interface.capture.connections) {
+    		ncr.builder.begin_object ();
+    		ncr.write_string("from", connection.host_a.to_string());
+    		ncr.write_string("to", connection.host_b.to_string());
+    		ncr.write_int("latency", connection.latency);
+			ncr.builder.end_object();
+		}
+	}
 
-		Json.Generator generator = new Json.Generator ();
-		generator.set_pretty (true);
-		Json.Node root = build_json.get_root ();
-		generator.set_root (root);
+	public void write_board(string filename, ref NPC.Interface main_interface) {
+		JsonConfigFile build_json = new JsonConfigFile();
+		build_json.start_builder();
+		build_json.build_array("hosts", write_hosts);
+		build_json.build_array("latencies", write_latencies);
 
-		string str = generator.to_data (null);
-
+		build_json.end_builder();
+		string str = build_json.generate_string_data();
 
 		main_interface.capture.save_pcap("pcap_file.pcap");
 
@@ -116,68 +117,37 @@ public class NPC.IOBoard {
 
 	}
 
+	void read_host(Json.Node n, JsonConfigFile ncr) {
+		string name = ncr.read_string(n, "name");
+		InetAddress address = ncr.read_inetaddress(n, "ip_address");
+		bool hide = ncr.read_bool(n, "hide");
 
-	void process (Json.Node node, ref NPC.Interface main_interface) {
-		unowned Json.Object obj = node.get_object ();
+		HostGraph hg = main_interface.hosts_graph.search_by_ip(address);
+		hg.name = name;
+		hg.hide = hide;
+		main_interface.refresh_hosts();
+		main_interface.refresh_connects();
+	 }
 
-		foreach (unowned string name_object in obj.get_members ()) {
-			switch (name_object) {
-			case "hosts":
-				unowned Json.Array array = obj.get_member (name_object).get_array ();
+	 void read_latencies(Json.Node n, JsonConfigFile ncr) {
+ 		InetAddress from = ncr.read_inetaddress(n, "from");
+ 		InetAddress to = ncr.read_inetaddress(n, "to");
+  		int64 latency = ncr.read_int(n, "latency");
 
-				foreach (unowned Json.Node item in array.get_elements ()) {
-					string name = "";
-					InetAddress address = null;
-					bool hide = false;
+		Connection c = main_interface.capture.connections.search_connection( new Connection (from, to) );
 
-					foreach (unowned string item_name in item.get_object().get_members ()) {
-						switch (item_name) {
-						case "name":
-							name = item.get_object().get_string_member(item_name);
-							break;
-						case "ip_address":
-							address = new InetAddress.from_string(item.get_object().get_string_member(item_name));
-							break;
-						case "hide":
-							hide = item.get_object().get_boolean_member(item_name);
-							break;
-						default: break;
-						}
-					}
-
-					HostGraph hg = main_interface.hosts_graph.search_by_ip(address);
-					hg.name = name;
-					hg.hide = hide;
-					main_interface.refresh_hosts();
-					main_interface.refresh_connects();
-				}
-
-				break;
-			case "pcap_filename":
-				stdout.printf ("%s\n", obj.get_string_member (name_object));
-				break;
-			case "latency":
-				stdout.printf ("%" + int64.FORMAT + "\n", obj.get_int_member (name_object));
-				break;
-			default:
-				break;
-			}
+		if (c != null) {
+			c.latency = (int32) latency;
 		}
-	}
+
+	 }
 
 	void read_json(string str, ref NPC.Interface main_interface) {
-		Json.Parser parser = new Json.Parser ();
-		try {
-			parser.load_from_data (str);
+		this.main_interface = main_interface;		
+		JsonConfigFile ncr = new JsonConfigFile.from_string(str);
 
-			// Get the root node:
-			Json.Node node = parser.get_root ();
-
-			// Process (print) the file:
-			process (node, ref main_interface);
-		} catch (Error e) {
-			stdout.printf ("Unable to parse the string: %s\n", e.message);
-		}
+		ncr.read_array(null, "hosts", read_host);
+		ncr.read_array(null, "latencies", read_latencies);
 	}
 
 	public Capture load_board(string filename, out Capture capture, ref NPC.Interface main_interface) {

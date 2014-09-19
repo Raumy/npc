@@ -32,10 +32,29 @@ public class ConnectsInfos {
 	Session _session = null;
 
 	
-	public Connection connection { get { return _connection; } }
-	public Session session { get { return _session; } }
-	public bool is_connection { get { return ((_connection != null) && (_session == null)); } }
-	public bool is_session { get { return _session != null; } }
+	public Connection connection { 
+		get { 
+			return _connection; 
+		} 
+	}
+
+	public Session session { 
+		get { 
+			return _session; 
+		} 
+	}
+
+	public bool is_connection { 
+		get { 
+			return ((_connection != null) && (_session == null)); 
+		} 
+	}
+
+	public bool is_session { 
+		get { 
+			return _session != null; 
+		} 
+	}
 	
 	public ConnectsInfos(Capture capture, string line) {
 		string ip_src;
@@ -44,9 +63,8 @@ public class ConnectsInfos {
 		int16 port_dst;
 		
 		MatchInfo info;
-		Regex r1 = /(?P<ip_src>\d+\.\d+\.\d+\.\d+) <--> (?P<ip_dst>\d+\.\d+\.\d+\.\d+)/;
-		Regex r2 = /(?P<ip_src>\d+\.\d+\.\d+\.\d+) <--> (?P<ip_dst>\d+\.\d+\.\d+\.\d+) \(frames: \d+\) S:(?P<port_src>\d+) D:(?P<port_dst>\d+) .*/;
-//		Regex r2 = /(?P<ip_src>\d+\.\d+\.\d+\.\d+):(?<port_src>\d+) <===> (?P<ip_dst>\d+\.\d+\.\d+\.\d+):(?<port_dst>\d+)/;
+		var r1 = new Regex ("(?P<ip_src>\\d+\\.\\d+\\.\\d+\\.\\d+) <--> (?P<ip_dst>\\d+\\.\\d+\\.\\d+\\.\\d+)");
+		var r2 = new Regex ("(?P<ip_src>\\d+\\.\\d+\\.\\d+\\.\\d+) <--> (?P<ip_dst>\\d+\\.\\d+\\.\\d+\\.\\d+) \\(frames: \\d+\\) S:(?P<port_src>\\d+) D:(?P<port_dst>\\d+) .*");
 
 		if (r1.match(line, 0, out info)) {
 			ip_src = info.fetch_named("ip_src");
@@ -87,9 +105,12 @@ public class ConnectsInfos {
 	}
 }
 
-
 public class NPC.Interface : Object {
-	public Gtk.Builder builder { get { return NPC.MainWindow.builder; } }
+	public Gtk.Builder builder { 
+		get { 
+			return NPC.MainWindow.builder; 
+		} 
+	}
 
 	public signal void sig_clicked_host(HostGraph hg);
 	public signal void sig_clicked_connection(Connection conn);
@@ -164,7 +185,6 @@ public class NPC.Interface : Object {
 		tsel_frames = tv_frames.get_selection();
 		tsel_frames.changed.connect(on_frames_changed);
 		ls_frames =  NPC.MainWindow.builder.get_object("store_frames") as ListStore;
-		/**/
 
 		Box b = NPC.MainWindow.builder.get_object("box2") as Box;
 		b.add(circle_interface);
@@ -177,7 +197,6 @@ public class NPC.Interface : Object {
 		sig_clicked_connection.connect(refresh_frames_list_from_connection);
 		
 		popup_hosts = NPC.MainWindow.builder.get_object("popup_hosts") as Gtk.Menu;
-		Gtk.MenuItem item = null;
 
 		((Gtk.MenuItem) builder.get_object("popup_hosts_delete")).activate.connect(on_hosts_delete);
 		((Gtk.MenuItem) builder.get_object("popup_hosts_icon")).activate.connect(on_hosts_change_icon);
@@ -355,9 +374,6 @@ public class NPC.Interface : Object {
 
 		NetFrames.Frame f = capture.frames.get_at(0);
 		GLib.TimeVal start_time_capture = f.time;
-
-// DateTime dt =  new DateTime.from_timeval_utc (f.pcap_frame.rec.ts);
-//		return calcul_abscisse(dt.difference(parent.from));		
 
 		foreach (Connection c in capture.connections) {
 			ts_connects.append (out root, null);

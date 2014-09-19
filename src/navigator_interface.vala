@@ -39,9 +39,6 @@ using NetFrames;
 
 //		Context context = Gdk.cairo_create(da.get_window());
 
-const int NAVIGATOR_MARGE_HORIZONTAL = 70;
-const int NAVIGATOR_MARGE_VERTICAL = 50;
-
 
 struct MouseInfos {
 	double time;
@@ -53,7 +50,6 @@ public class NavigatorLine : TypedLine {
 	public bool selected = false;
 	public bool changed = true;
 	public uint32 len = 0;
-
 
 	public NavigatorLine(Point s, Point e) {
 		base(s, e);
@@ -103,6 +99,27 @@ public class Rubberband {
 }
 
 public class DrawingNavigator : DrawingArea {
+	public Gtk.Builder builder { 
+		get { 
+			return NPC.MainWindow.builder; 
+		} 
+	}
+
+	const int MARGE_HORIZONTAL = 70;
+	const int MARGE_VERTICAL = 50;
+
+	int navigator_width {
+		get {
+			return get_allocated_width() - 2 * MARGE_HORIZONTAL;
+		}
+	}
+
+	int navigator_height {
+		get {
+			return get_allocated_height() - 2 * MARGE_VERTICAL;
+		}
+	}
+
 	unowned NPC.NavigatorInterface parent = null;
 	public unowned HostsGraph hosts_graph = null;
 	public HostGraph clicked = null;
@@ -129,19 +146,11 @@ public class DrawingNavigator : DrawingArea {
 
 		// initialisation du popup
 		popup = NPC.MainWindow.builder.get_object("popup_hosts") as Gtk.Menu;
-		Gtk.MenuItem item = null;
 
-		item = NPC.MainWindow.builder.get_object("popup_hosts_delete") as Gtk.MenuItem;
-		item.activate.connect(on_hosts_delete);
-
-		item = NPC.MainWindow.builder.get_object("popup_hosts_icon") as Gtk.MenuItem;
-		item.activate.connect(on_hosts_change_icon);
-
-		item = NPC.MainWindow.builder.get_object("popup_reference") as Gtk.MenuItem;
-		item.activate.connect(on_hosts_reference);
-
-		item = NPC.MainWindow.builder.get_object("popup_host_hide") as Gtk.MenuItem;
-		item.activate.connect(on_hosts_hide_unhide);
+		((Gtk.MenuItem) builder.get_object("popup_hosts_delete")).activate.connect(on_hosts_delete);
+		((Gtk.MenuItem) builder.get_object("popup_hosts_icon")).activate.connect(on_hosts_change_icon);
+		((Gtk.MenuItem) builder.get_object("popup_reference")).activate.connect(on_hosts_change_icon);
+		((Gtk.MenuItem) builder.get_object("popup_host_hide")).activate.connect(on_hosts_hide_unhide);
 
 		// initialisation des signaux
 		add_events(Gdk.EventMask.BUTTON_PRESS_MASK);
@@ -185,26 +194,24 @@ public class DrawingNavigator : DrawingArea {
 	public void calcul_hosts_position() {
 		if (parent.parent.capture == null) return;
 
-		int htx = get_allocated_height();
-
-		int start_y = NAVIGATOR_MARGE_VERTICAL;
-		int gap = (int) ((htx - 2 * NAVIGATOR_MARGE_VERTICAL) / (hosts_graph.unhide_size() - 1));
+		int gap = (int) (navigator_height / (hosts_graph.unhide_size() - 1));
+		int start_y = MARGE_VERTICAL;
 
 		foreach (HostGraph hg in hosts_graph) {
 			if (hg.hide) continue;
+
 			hg.put(20, start_y  - HOST_RADIUS);
+
 			start_y += gap;
 		}
 	}
 
 	int calcul_abscisse(int64 microtime) {
-		int wtx = get_allocated_width() - 2 * NAVIGATOR_MARGE_HORIZONTAL;
-
-		return (int) ( (microtime - parent.ajust_scroll.value)* wtx / parent.interval);
+		return (int) ( (microtime - parent.ajust_scroll.value)* navigator_width / parent.interval);
 	}
 
 	// calcule l'abscisse  donnée par le temps de la trame
-	public int calcul_x(NetFrames.Frame f) {
+	public int get_abscisse_from_time(NetFrames.Frame f) {
 		// temps entre la première trame affichée et la trame en paramètre
 		// diff est en µs
 		DateTime dt =  new DateTime.from_timeval_utc (f.pcap_frame.rec.ts);
@@ -213,10 +220,7 @@ public class DrawingNavigator : DrawingArea {
 	}
 
 	public int delay(int latency) {
-		int wtx = get_allocated_width();
-		int x = (int) (latency * wtx / parent.interval); // intervalle de 1s, soit 1000ms
-
-		return x;
+		return (int) (latency * get_allocated_width() / parent.interval); // intervalle de 1s, soit 1000ms
 	}
 
 	public void build_nav_lines() {
@@ -224,13 +228,12 @@ public class DrawingNavigator : DrawingArea {
 
 		// HostGraph ref_host = parent.parent.ref_host;
 
-		HostGraph other_host = null;
 		HostGraph hg1 = null;
 		HostGraph hg2 = null;
 
 		Line line = null;
 		nav_lines.clear();
-		NetFrames.Frame next = null;
+		
 		foreach (Connection c in parent.capture.connections) {
 			foreach (Session s in c.sessions) {
 				if (parent.sessions_hide.search_session(s) != null) continue;
@@ -248,13 +251,13 @@ public class DrawingNavigator : DrawingArea {
 					if (hg1.hide || hg2.hide) continue;
 
 					if ((s.flow_informations != null) && (s.flow_informations.has_reference_frame(f, out reference)))
-						abs = calcul_x(reference) + NAVIGATOR_MARGE_HORIZONTAL;
+						abs = get_abscisse_from_time(reference) + MARGE_HORIZONTAL;
 					else
-						abs = calcul_x(f) + NAVIGATOR_MARGE_HORIZONTAL;
+						abs = get_abscisse_from_time(f) + MARGE_HORIZONTAL;
 
 
-					if (abs > get_allocated_width() - NAVIGATOR_MARGE_HORIZONTAL) continue;
-//					if (abs < NAVIGATOR_MARGE_VERTICAL + HOST_DIAMETER) continue;
+					if (abs > get_allocated_width() - MARGE_HORIZONTAL) continue;
+//					if (abs < MARGE_VERTICAL + HOST_DIAMETER) continue;
 
 
 					// la trame en cours peut avoir :
@@ -263,16 +266,16 @@ public class DrawingNavigator : DrawingArea {
 					// ni l'un ni l'autre, et bien on ajoute la latence par défaut
 
 					if (parent.parent.is_host_reference(hg1.host_addr)) {
-						line = new Line.from_coordinates(abs, hg1.center_y, calcul_x(f) + NAVIGATOR_MARGE_HORIZONTAL + delay(c.latency), hg2.center_y);					
+						line = new Line.from_coordinates(abs, hg1.center_y, get_abscisse_from_time(f) + MARGE_HORIZONTAL + delay(c.latency), hg2.center_y);					
 //						stdout.printf ("Frame %s is source and reference\n", hg1.host_addr.to_string());
 					} 
 					else if (parent.parent.is_host_reference(hg2.host_addr)) {
-//						line = new Line.from_coordinates(calcul_x(f) + NAVIGATOR_MARGE_VERTICAL - delay(c.latency), hg1.center_y, abs , hg2.center_y);					
-						line = new Line.from_coordinates(abs - delay(c.latency), hg1.center_y, calcul_x(f) + NAVIGATOR_MARGE_HORIZONTAL , hg2.center_y);					
+//						line = new Line.from_coordinates(get_abscisse_from_time(f) + MARGE_VERTICAL - delay(c.latency), hg1.center_y, abs , hg2.center_y);					
+						line = new Line.from_coordinates(abs - delay(c.latency), hg1.center_y, get_abscisse_from_time(f) + MARGE_HORIZONTAL , hg2.center_y);					
 //						stdout.printf ("Frame %s is destination and reference\n", hg2.host_addr.to_string());
 
 					} else
-						line = new Line.from_coordinates(abs, hg1.center_y, calcul_x(f) + NAVIGATOR_MARGE_HORIZONTAL + delay(c.latency), hg2.center_y);
+						line = new Line.from_coordinates(abs, hg1.center_y, get_abscisse_from_time(f) + MARGE_HORIZONTAL + delay(c.latency), hg2.center_y);
 /*
 					if (reference != null) {
 						stdout.printf ("%d has ref %d\n", (int) f.num, (int) reference.num );
@@ -287,7 +290,7 @@ public class DrawingNavigator : DrawingArea {
 							stdout.printf ("%d / %d\n", (int) f.num, (int) next.num);
 							f.display(); next.display();
 							if (f.pcap_frame.tcp_hdr.th_seq == next.pcap_frame.tcp_hdr.th_ack) {
-								int abs2 = calcul_x(next) + NAVIGATOR_MARGE_VERTICAL;
+								int abs2 = get_abscisse_from_time(next) + MARGE_VERTICAL;
 								line = new Line.from_coordinates(abs, hg1.center_y, abs2, hg2.center_y);
 								double latency = next.time.tv_usec - f.time.tv_usec;
 								stdout.printf ("%f\n", latency / 1000);
@@ -297,7 +300,7 @@ public class DrawingNavigator : DrawingArea {
 */
 /*
 					if (line == null)
-						line = new Line.from_coordinates(abs, hg1.center_y, calcul_x(f) + NAVIGATOR_MARGE_VERTICAL + delay(c.latency), hg2.center_y);
+						line = new Line.from_coordinates(abs, hg1.center_y, get_abscisse_from_time(f) + MARGE_VERTICAL + delay(c.latency), hg2.center_y);
 */
 					nav_lines.add_line(f, line);
 					line = null;					
@@ -314,9 +317,11 @@ public class DrawingNavigator : DrawingArea {
 
 		foreach (uint key in nav_lines.keys) {
 			NavigatorLine l = nav_lines[key];
+
 			if (!l.changed && !force) continue;
 
 			l.changed = false;
+
 			if (l.selected)
 				ColorScheme.set_color(context, "Gray_60%");
 			else
@@ -354,17 +359,17 @@ public class DrawingNavigator : DrawingArea {
 
 	public bool on_draw(Widget da, Context context) {
 		Gdk.Rectangle rubber_rect = Gdk.Rectangle();
+/*
+		uint keyval;
+		Gdk.ModifierType modifiers;
 
+		Gdk.Device.get_key (0, out  keyval, out  modifiers) ;
+*/
+
+		//stdout.printf("shift state %d\n", test);
 
 		if (parent.parent.capture == null) return true;
-/*
-                if (! region_invalidation.is_null) {
-                        context.rectangle(region_invalidation.left - 5, region_invalidation.top - 5,
-                                region_invalidation.width + 5, region_invalidation.height + 5);
-                        context.clip();
-                        region_invalidation.set(rubberband
-                }
- */
+
 		if (doing_rubberband) {
 			rubber_rect.x = (int) Math.fmin(rubberband.x1, rubberband.x2);
 			rubber_rect.y = (int) Math.fmin (rubberband.y1, rubberband.y2);
@@ -554,7 +559,7 @@ public class DrawingNavigator : DrawingArea {
 			return true;
 		}
 
-		if ((event.x < NAVIGATOR_MARGE_HORIZONTAL) || (event.x > get_allocated_width() - NAVIGATOR_MARGE_HORIZONTAL)) return true;
+		if ((event.x < MARGE_HORIZONTAL) || (event.x > get_allocated_width() - MARGE_HORIZONTAL)) return true;
 
 		if (event.button == 3)
 			zoom_selection = true;
@@ -567,7 +572,7 @@ public class DrawingNavigator : DrawingArea {
 	}
 
 	public bool on_mouse_move(Gdk.EventMotion event) {
-//		if ((event.x < NAVIGATOR_MARGE_HORIZONTAL) || (event.x > get_allocated_width() - NAVIGATOR_MARGE_HORIZONTAL)) return false;
+//		if ((event.x < MARGE_HORIZONTAL) || (event.x > get_allocated_width() - MARGE_HORIZONTAL)) return false;
 
 		mouse_infos.time = time_from_abscisse(event.x);
 		mouse_infos.position = event.x;
@@ -592,9 +597,9 @@ public class DrawingNavigator : DrawingArea {
 	}
 
 	public double time_from_abscisse(double x) {
-		int wtx = get_allocated_width() - 2 * NAVIGATOR_MARGE_HORIZONTAL;
+		int wtx = get_allocated_width() - 2 * MARGE_HORIZONTAL;
 
-		return ((x - NAVIGATOR_MARGE_HORIZONTAL) * parent.interval) / wtx + parent.ajust_scroll.value;
+		return ((x - MARGE_HORIZONTAL) * parent.interval) / wtx + parent.ajust_scroll.value;
 	}
 
 }

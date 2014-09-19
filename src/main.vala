@@ -36,14 +36,14 @@ extern const string GETTEXT_PACKAGE;
 public class NPC.MainWindow {
 	public Capture capture = null;
 
+	public static Gtk.Builder builder = null;
+
 	NPC.Interface main_interface = null;
-	NPC.IOBoard in_out_file = new NPC.IOBoard();
+	NPC.ConfigFile in_out_file = new NPC.ConfigFile();
 
 	public Window window;
-	Window modal;
-	Window hosts_ref;
+//	Window hosts_ref;
 
-	public static Gtk.Builder builder = null;
 
 	ScrolledWindow scw_connects = null;
 	public static bool shift_pressed = false;
@@ -97,34 +97,19 @@ public class NPC.MainWindow {
 
 //		window.window_state_event.connect (window_state_event);
 
-		modal = builder.get_object("window_modal") as Window;
-		hosts_ref = builder.get_object("win_hosts_ref") as Window;
+		// modal = builder.get_object("window_modal") as Window;
+//		hosts_ref = builder.get_object("win_hosts_ref") as Window;
 
 		main_interface = new NPC.Interface();
 		init_menu(builder);
 	}
 
 	void init_menu(Gtk.Builder builder) {
-		/*
-		Gtk.MenuItem mi = null;
-		mi = builder.get_object("menuitem_open") as Gtk.MenuItem;
-		mi.activate.connect(open_board);
-		mi = builder.get_object("menuitem_save") as Gtk.MenuItem;
-		mi.activate.connect(save_board);
-		mi = builder.get_object("menuitem_import") as Gtk.MenuItem;
-		mi.activate.connect(import_capture);
-		mi = builder.get_object("menuitem_export") as Gtk.MenuItem;
-		mi.activate.connect(export_capture);
-		mi = builder.get_object("menuitem_quit") as Gtk.MenuItem;
-		mi.activate.connect(stop_main);
-		*/
-
 		((Gtk.MenuItem) builder.get_object("menuitem_open")).activate.connect(open_board);
 		((Gtk.MenuItem) builder.get_object("menuitem_save")).activate.connect(save_board);
 		((Gtk.MenuItem) builder.get_object("menuitem_import")).activate.connect(import_capture);
 		((Gtk.MenuItem) builder.get_object("menuitem_export")).activate.connect(export_capture);
 		((Gtk.MenuItem) builder.get_object("menuitem_quit")).activate.connect(stop_main);
-
 	}
 
 	public void select_captured_host() {
@@ -158,9 +143,11 @@ public class NPC.MainWindow {
 	public void check_show_hosts_reference() {
 		Gtk.CheckMenuItem ci = builder.get_object("chk_show_hosts_ref") as Gtk.CheckMenuItem;
 		if (ci.active)
-			hosts_ref.show_all();
+			// hosts_ref.show_all();
+			((Window) builder.get_object("win_hosts_ref")).show_all();
 		else
-			 hosts_ref.set_visible (false);
+			// hosts_ref.set_visible (false);
+			((Window) builder.get_object("win_hosts_ref")).set_visible(false);
 	}
 
 	public void stop_main() {

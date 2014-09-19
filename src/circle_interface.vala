@@ -27,6 +27,7 @@ using Gtk;
 using Cairo;
 using NetFrames;
 
+
 // Angle en degré = 180 * (angle en radian) / pi
 // Angle en radian = pi * (angle en degré) / 180
 
@@ -133,6 +134,8 @@ public class CircleConnection : TypedLine {
 }
 
 public class NPC.CircleInterface : DrawingArea {
+	public Gtk.Builder builder { get { return NPC.MainWindow.builder; } }
+
 	Gtk.Menu popup = null;
 	public unowned HostsGraph hosts_graph = null;
 	public ArrayList<CircleConnection> connections = new ArrayList<CircleConnection>();
@@ -169,21 +172,12 @@ public class NPC.CircleInterface : DrawingArea {
 
 		// initialisation du popup
 		popup = NPC.MainWindow.builder.get_object("popup_circle") as Gtk.Menu;
-		Gtk.MenuItem item = null;
 
-		item = NPC.MainWindow.builder.get_object("popup_line_single") as Gtk.MenuItem;
-		item.activate.connect(on_line_single);
-
-		item = NPC.MainWindow.builder.get_object("popup_line_in_out") as Gtk.MenuItem;
-		item.activate.connect(on_line_in_out);
-
-		item = NPC.MainWindow.builder.get_object("popup_text_size") as Gtk.MenuItem;
-		item.activate.connect(on_text_size);
-		item = NPC.MainWindow.builder.get_object("popup_text_latency") as Gtk.MenuItem;
-		item.activate.connect(on_text_latency);
-
-		item = NPC.MainWindow.builder.get_object("popup_latency") as Gtk.MenuItem;
-		item.activate.connect(on_latency);
+		((Gtk.MenuItem) builder.get_object("popup_line_single")).activate.connect(on_line_single);
+		((Gtk.MenuItem) builder.get_object("popup_line_in_out")).activate.connect(on_line_in_out);
+		((Gtk.MenuItem) builder.get_object("popup_text_size")).activate.connect(on_text_size);
+		((Gtk.MenuItem) builder.get_object("popup_text_latency")).activate.connect(on_text_latency);
+		((Gtk.MenuItem) builder.get_object("popup_latency")).activate.connect(on_latency);
 
 		add_events(Gdk.EventMask.BUTTON_PRESS_MASK);
 		add_events(Gdk.EventMask.BUTTON_RELEASE_MASK);
