@@ -84,7 +84,8 @@ vala_precompile(VALA_C
 		src/frames_model.vala
 		src/colors_scheme.vala
 		src/npc_ui.vala
-		src/io_board.vala
+		src/json_config_file.vala
+		src/npc_config_file.vala
 	CUSTOM_VAPIS
 		${CMAKE_CURRENT_SOURCE_DIR}/lib/libnetframes.vapi
 	PACKAGES
