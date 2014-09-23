@@ -197,12 +197,12 @@ public class NPC.Interface : Object {
 		sig_clicked_connection.connect(refresh_frames_list_from_connection);
 		
 		popup_hosts = NPC.MainWindow.builder.get_object("popup_hosts") as Gtk.Menu;
-
+/*-
 		((Gtk.MenuItem) builder.get_object("popup_hosts_delete")).activate.connect(on_hosts_delete);
-		((Gtk.MenuItem) builder.get_object("popup_hosts_icon")).activate.connect(on_hosts_change_icon);
+//		((Gtk.MenuItem) builder.get_object("popup_hosts_icon")).activate.connect(on_hosts_change_icon);
 		((Gtk.MenuItem) builder.get_object("popup_reference")).activate.connect(on_hosts_reference);
 		((Gtk.MenuItem) builder.get_object("popup_host_hide")).activate.connect(on_hosts_hide_unhide);
-
+*/
 
 		popup_connects = NPC.MainWindow.builder.get_object("popup_connects") as Gtk.Menu;
 
@@ -215,6 +215,16 @@ public class NPC.Interface : Object {
 		//sig_host_renamed.connect(on_renamed_host);
     }
         
+	public void reset_capture() {
+		capture.frames.clear();
+		capture.hosts.clear();
+		hosts_graph.clear();
+		capture.connections.clear();
+		refresh_hosts();
+		circle_interface.redraw();
+		capture = null;
+	}
+
     public void clear() {
     	deletion_progress = true;
    		clicked = null;
@@ -460,6 +470,12 @@ public class NPC.Interface : Object {
 // 		capture.sig_delete_host(host);
 		capture.delete_host(host);
 		
+		if (capture.hosts.size == 0) {
+			reset_capture();
+			return;
+		}
+
+
 		int i = 0;
 		HostGraph hg = null;
 
@@ -628,10 +644,10 @@ public class NPC.Interface : Object {
 
 	public void on_hosts_delete() {
 		if (clicked == null) return;
-		
+
 		delete_host(clicked.host_addr);
 		clicked = null;
-		
+
 		/*
 		delete_clicked_host();
 		circle_interface.redraw();		
@@ -665,6 +681,9 @@ public class NPC.Interface : Object {
 	}
 
 	public void add_host_as_reference(HostGraph hg) {
+
+		/*
+		// Code for "multiple references"
 		if (is_host_reference(hg.host_addr))
 			return;
 
@@ -672,6 +691,12 @@ public class NPC.Interface : Object {
 
 		ls_hosts_ref.append (out iter);
 		ls_hosts_ref.set (iter, 0, hg.host_addr.to_string());		
+		*/
+
+		if (! capture.capture_from.equal(hg.host_addr)) {
+			capture.capture_from = hg.host_addr;
+			circle_interface.redraw();
+		}
 	}
 
 	public void on_hosts_reference() {
@@ -682,7 +707,8 @@ public class NPC.Interface : Object {
 	}
 	
 	public void on_hosts_change_icon() {
-		FileChooserDialog fcd =  new FileChooserDialog("Choisir une incone", null,  Gtk.FileChooserAction.OPEN,
+stdout.printf ("::: %s - %s :: %d ::: \n", GLib.Log.FILE, GLib.Log.METHOD, GLib.Log.LINE);
+		FileChooserDialog fcd =  new FileChooserDialog("Choisir une icone", null,  Gtk.FileChooserAction.OPEN,
 			"_Annuler",
 			Gtk.ResponseType.CANCEL,
 			"_Ouvrir",

@@ -242,6 +242,13 @@ public class NPC.MainWindow {
 
 	}
 
+	public void reset_capture() {
+		capture.frames.clear();
+		capture.hosts.clear();
+		main_interface.hosts_graph.clear();
+		capture.connections.clear();
+		capture = null;
+	}
 
 	void save_board() {
 		FileChooserDialog fcd =  new FileChooserDialog("Enregistrer", window,  Gtk.FileChooserAction.SAVE,
@@ -255,7 +262,7 @@ public class NPC.MainWindow {
 		fcd.set_current_folder(".");
 
 		if (fcd.run() == Gtk.ResponseType.ACCEPT) {
-			in_out_file.write_board(fcd.get_filename(), ref main_interface);
+			in_out_file.save_npc_file(fcd.get_filename(), ref main_interface);
 		}
 		fcd.destroy();
 
@@ -277,14 +284,11 @@ public class NPC.MainWindow {
 			string filename = fcd.get_filename();
 			fcd.destroy();
 
-			if (capture != null) {
-				capture.frames.clear();
-				capture.hosts.clear();
-				main_interface.hosts_graph.clear();
-				capture.connections.clear();
-			}
+			if (capture != null) 
+				reset_capture();
+				
 			msg.show();
-			in_out_file.load_board(filename, out capture, ref main_interface);
+			in_out_file.load_npc_file(filename, out capture, ref main_interface);
 			msg.destroy();
 			select_captured_host();
 		} else {

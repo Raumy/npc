@@ -149,7 +149,7 @@ public class DrawingNavigator : DrawingArea {
 
 		((Gtk.MenuItem) builder.get_object("popup_hosts_delete")).activate.connect(on_hosts_delete);
 		((Gtk.MenuItem) builder.get_object("popup_hosts_icon")).activate.connect(on_hosts_change_icon);
-		((Gtk.MenuItem) builder.get_object("popup_reference")).activate.connect(on_hosts_change_icon);
+		((Gtk.MenuItem) builder.get_object("popup_reference")).activate.connect(on_hosts_reference);
 		((Gtk.MenuItem) builder.get_object("popup_host_hide")).activate.connect(on_hosts_hide_unhide);
 
 		// initialisation des signaux
@@ -177,7 +177,7 @@ public class DrawingNavigator : DrawingArea {
 	}
 
 	public void on_hosts_reference() {
-		parent.parent.add_host_as_reference(clicked);
+		parent.parent.add_host_as_reference(parent.parent.clicked);
 		build_nav_lines();
 		redraw();
 	}

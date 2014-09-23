@@ -47,20 +47,21 @@ public class NPC.ConfigFile {
 		}
 	}
 
-	public void write_board(string filename, ref NPC.Interface main_interface) {
+	public void save_npc_file(string filename, ref NPC.Interface main_interface) {
 		JsonConfigFile build_json = new JsonConfigFile();
 		build_json.start_builder();
 		build_json.build_array("hosts", write_hosts);
 		build_json.build_array("latencies", write_latencies);
+		build_json.write_string("ref_host", main_interface.capture.capture_from.to_string());
 
 		build_json.end_builder();
 		string str = build_json.generate_string_data();
 
 		main_interface.capture.save_pcap("pcap_file.pcap");
 
-		// create a writable archive
+		// create anarchive
 		var archive = new Archive.Write();
-		// var buffer = new char[ARCHIVE_BUFFER];
+
 
 		// set archive format
 		archive.set_format_pax_restricted();
@@ -142,15 +143,16 @@ public class NPC.ConfigFile {
 
 	 }
 
-	void read_json(string str, ref NPC.Interface main_interface) {
+	void read_npc_config_file(string str, ref NPC.Interface main_interface) {
 		this.main_interface = main_interface;		
 		JsonConfigFile ncr = new JsonConfigFile.from_string(str);
 
 		ncr.read_array(null, "hosts", read_host);
 		ncr.read_array(null, "latencies", read_latencies);
+		main_interface.capture.capture_from = ncr.read_inetaddress(null, "ref_host");
 	}
 
-	public Capture load_board(string filename, out Capture capture, ref NPC.Interface main_interface) {
+	public Capture load_npc_file(string filename, out Capture capture, ref NPC.Interface main_interface) {
 		Archive.Read read = new Archive.Read();
 
 		weak Archive.Entry entry;
@@ -217,7 +219,7 @@ public class NPC.ConfigFile {
 			read.read_data_skip();
 		}
 
-		read_json(config, ref main_interface);
+		read_npc_config_file(config, ref main_interface);
 		return main_interface.capture;
 	}
 
